@@ -5,8 +5,10 @@ import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
-@Component
+//@Component
 public class PythonPackageManager {
 
     void createVirtualEnvironment(String pathToVirtualEnvironmentParent, String virtualEnvironmentName) {
@@ -20,10 +22,11 @@ public class PythonPackageManager {
                         .append(virtualEnvironmentName);
                 break;
             case Linux: case MacOS:
-                stringBuilder.append("python3 -m pip install virtualenv && cd ")
+                stringBuilder.append("bash -c 'python3 -m pip install virtualenv --user && cd ")
                         .append(pathToVirtualEnvironmentParent)
                         .append(" && python3 -m virtualenv ")
-                        .append(virtualEnvironmentName);
+                        .append(virtualEnvironmentName)
+                        .append("");
                 break;
         }
 
@@ -32,6 +35,11 @@ public class PythonPackageManager {
         try {
             Runtime run = Runtime.getRuntime();
             Process pr = run.exec(cmd);
+BufferedReader in = new BufferedReader(new InputStreamReader(pr.getErrorStream()));
+String line;
+while ((line = in.readLine()) != null) {
+System.out.println(line);
+}
             pr.waitFor();
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
